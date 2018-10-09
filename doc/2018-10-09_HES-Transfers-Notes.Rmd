@@ -1,0 +1,46 @@
+---
+title: "HES Hospital Transfer Project"
+author: "David Barron"
+date: "9 October 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(readxl)
+library(tidyverse)
+```
+
+# HES data dictionary
+
+The HES data dictionary web page is: https://digital.nhs.uk/data-and-information/data-tools-and-services/data-services/hospital-episode-statistics/hospital-episode-statistics-data-dictionary
+
+```{r dictionary}
+dict <- read_excel(here("doc/HESDataDictionary25042018.xlsx"),  sheet = "APC")
+```
+
+## Find fields that are associated with patient origin and destination.
+
+```{r}
+dict %>% mutate(Row = row_number()) %>%
+  filter(grepl("other hospital", .$Value, ignore.case = TRUE)) %>%
+  select(Row, `Field name`)
+
+```
+
+## Find fields that identify hospital
+
+* Provider code (row 227)
+* Provider type (row 231)
+* Referring organisation code (row 241)
+
+
+## Find fields that identify treatment speciality
+
+```{r}
+dict %>% 
+  mutate(Row = row_number()) %>%
+  filter(grepl("specialty", .$Value, ignore.case = TRUE)) %>%
+  select(Row, `Field name`)
+```
